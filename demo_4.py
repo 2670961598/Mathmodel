@@ -3,7 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-commissionbit = 0.98 #佣金 比特币
+commissionbit = 0.98#佣金 比特币
 commissiongold = 0.99 #佣金 ，黄金
 
 start = 17
@@ -115,7 +115,8 @@ def judge(wallet,i,slope,*args):
     #goldlinem = regression(goldlistj)  # 黄金回归曲线
     bitcoinlinem = regression(bitcoinlistj)  # 比特币回归曲线
     #goldlinen = regression(goldlistj[-int(round / 5):-1])  # 黄金近期曲线
-    bitcoinlinen = regression(bitcoinlistj[-int(round / 5):-1])  # 比特币近期曲线
+    #bitcoinlinen = regression(bitcoinlistj[-int(round / 5):-1])  # 比特币近期曲线
+    bitcoinlinen = regression(bitcoinlistj[-3:-1])  # 比特币近期曲线
     da.append(bitcoinlinem)
     xiao.append(bitcoinlinen)
     ##################################################################################################################
@@ -124,39 +125,7 @@ def judge(wallet,i,slope,*args):
     # print(bitcoinlinem)
     # print("xiao" , end="")
     # print(bitcoinlinen)
-    if wallet.dollor == 0:
-        if wallet.bitcoin >= wallet.base * wallet.lilv and bitcoinlinem > -0.7:  # 如果比特币升值，总体也升值，就放置
-            wallet.lilv = (wallet.dollor + wallet.bitcoin) / wallet.base
-            if bitcoinlinen > 0:  # 最近几天也上升
-                return 2
-            else:  # 最近几天下降
-                if (wallet.bitcoin) / wallet.base < wallet.lilv * 0.982:  # 0.882
-                    return 1
-                else:
-                    return 2
-        elif wallet.bitcoin < wallet.base * wallet.lilv and bitcoinlinem > -0.7:  # 如果比特币贬值，但整体升值，和手续费比较，能抵消就不卖
-            if (wallet.bitcoin) / wallet.base < wallet.lilv * 0.882:  # 0.882
-                if bitcoinlinen < 000:
-                    return 1
-                else:
-                    return 2
-            else:
-                return 2
-        elif wallet.bitcoin >= wallet.base * wallet.lilv and bitcoinlinem < 0:  # 如果比特币升值，但总体下降，立马卖
-            wallet.lilv = (wallet.dollor + wallet.bitcoin) / wallet.base
-            return 1
-        else:  # 如果比特币贬值，整体也下降，就卖
-            if (wallet.bitcoin) / wallet.base < wallet.lilv*0.892:  # 0.882
-                return 2
-            else:
-                return 1
-    else:
-        if bitcoinlinem > 8.2:
-            #print(wallet.lilv)
-            wallet.lilv = commissionbit * commissionbit * 0
-            return 0
-        else:
-            return 2
+
     #策略
     ##########################################################################################################################
 
@@ -288,7 +257,7 @@ if __name__ == "__main__":
         print(n ,end=" ")
         print(wallet.recordnum,end="  ")
         e.append(n)
-        f.append(wallet.recordnum*500)
+        f.append(wallet.recordnum)
         g.append(wallet.dollor+wallet.bitcoin)
         #wallet.record.sort(key=None,reverse=False)
         print(wallet.record[-1])
@@ -300,7 +269,8 @@ if __name__ == "__main__":
 
     iii = []
     for i in range(len(wallet.record)):
-        iii.append(wallet.record[i]*0.1)
+        iii.append(wallet.record[i])
+        price.bitcoinnow[i] *= 10
     plt.plot(range(0,len(wallet.record)),iii)
 
     #plt.plot(e, f,g)
