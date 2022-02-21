@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 commissionbit = 0.98#佣金 比特币
 commissiongold = 0.99 #佣金 ，黄金
 
-start = 17
-end   = 18
+start = 15
+end   = 50
 
 class Wallet:
     def __init__(self):       #基本信息设置
@@ -22,6 +22,8 @@ class Wallet:
         self.recordnum = 0  # 记录交易次数
         self.dollorin = []  # 记录购买视觉
         self.dollorout = []  # 记录卖出时间
+
+        self.bitcoinm = 0
 
     def now(self):           #方便随时显示基本信息
         print("现有本金" + str(self.dollor) + "美元 \n黄金" + str(self.gold) + "美元 \n比特币" + str(self.bitcoin) + "美元")
@@ -119,6 +121,7 @@ def judge(wallet,i,slope,*args):
     bitcoinlinen = regression(bitcoinlistj[-3:-1])*50000  # 比特币近期曲线
     da.append(bitcoinlinem)
     xiao.append(bitcoinlinen)
+
     ##################################################################################################################
     #策略  返回0买（得有钱），返回1卖（得有比特币） 返回其他任意数字均为不动
     # print("da" , end="")
@@ -129,42 +132,42 @@ def judge(wallet,i,slope,*args):
         if wallet.bitcoin >= wallet.base * wallet.lilv and bitcoinlinem > -0.7:  # 如果比特币升值，总体也升值，就放置
             wallet.lilv = (wallet.dollor + wallet.bitcoin) / wallet.base
             if bitcoinlinen > 0:  # 最近几天也上升
-                print(wallet.lilv)
+                #print(wallet.lilv)
                 return 2
             else:  # 最近几天下降
                 if (wallet.bitcoin) / wallet.base < wallet.lilv * 0.982:  # 0.882
-                    print(wallet.lilv)
+                    #print(wallet.lilv)
                     return 1
                 else:
-                    print(wallet.lilv)
+                    #print(wallet.lilv)
                     return 2
         elif wallet.bitcoin < wallet.base * wallet.lilv and bitcoinlinem > -0.7:  # 如果比特币贬值，但整体升值，和手续费比较，能抵消就不卖
             if (wallet.bitcoin) / wallet.base < wallet.lilv * 0.882:  # 0.882
                 if bitcoinlinen < 0:
-                    print(wallet.lilv)
+                    #print(wallet.lilv)
                     return 1
                 else:
-                    print(wallet.lilv)
+                    #print(wallet.lilv)
                     return 2
             else:
-                print(wallet.lilv)
+                #print(wallet.lilv)
                 return 2
         elif wallet.bitcoin >= wallet.base * wallet.lilv and bitcoinlinem < 0:  # 如果比特币升值，但总体下降，立马卖
             wallet.lilv = (wallet.dollor + wallet.bitcoin) / wallet.base
-            print(wallet.lilv)
+            #print(wallet.lilv)
             return 1
         else:  # 如果比特币贬值，整体也下降，就卖
             if (wallet.bitcoin) / wallet.base < wallet.lilv*0.892:  # 0.882
-                print(wallet.lilv)
+                #print(wallet.lilv)
                 return 2
             else:
-                print(wallet.lilv)
+                #print(wallet.lilv)
                 return 1
     else:
         if bitcoinlinem > 8.2:
 
             wallet.lilv = commissionbit * commissionbit * 1.11
-            print(wallet.lilv)
+            #print(wallet.lilv)
             return 0
 
         else:
@@ -196,7 +199,9 @@ if __name__ == "__main__":
 
     print(len(price.goldstate))
 
-
+    aaa = []
+    bbb = []
+    ccc = []
 
     e = []
     f = []
@@ -299,6 +304,9 @@ if __name__ == "__main__":
                 del goldlist[0]
         print(n ,end=" ")
         print(wallet.recordnum,end="  ")
+        aaa.append(round)
+        bbb.append(wallet.recordnum)
+        ccc.append(wallet.dollor+wallet.bitcoin)
         e.append(n)
         f.append(wallet.recordnum)
         g.append(wallet.dollor+wallet.bitcoin)
@@ -307,9 +315,11 @@ if __name__ == "__main__":
         if wallet.record[-1] > hhh:
             hhh = wallet.record[-1]
             kkk = n
-        # plt.plot(range(0, len(wallet.record)), wallet.record)
-        # plt.show()
+        #plt.plot(range(len(wallet.record)), wallet.record)
+        #plt.show()
 
+    plt.rcParams['font.sans-serif'] = ['SimHei']
+    plt.rcParams['axes.unicode_minus'] = False
     iii = []
     for i in range(len(wallet.record)):
         iii.append(wallet.record[i])
@@ -317,7 +327,7 @@ if __name__ == "__main__":
     #plt.plot(range(0,len(wallet.record)),iii)
 
     #plt.plot(e, f,g)
-    print(wallet.record)
+    #print(wallet.record)
 
     r = 0
     t = []
@@ -344,8 +354,8 @@ if __name__ == "__main__":
     #
     # print(len(price.goldnow))
     # print(len(goldlist))
-    print(hhh)
-    print(kkk)
+    # print(hhh)
+    # print(kkk)
     # for i in range(1809):
     #     del da[i],xiao[i]
     # v = 0
@@ -371,23 +381,39 @@ if __name__ == "__main__":
     newrecordnum = 0
     nrecordnum = []
     sumrecord = 0
-    for i in range(18):
-        print(regression(wallet.record[i*100:(i+1)*100]))
-        newrecord.append(regression(wallet.record[i*100:(i+1)*100]))
-        if regression(wallet.record[i*100:(i+1)*100]) < 0:
-            newrecordnum += 1
-            nrecordnum.append(regression(wallet.record[i*100:(i+1)*100]))
-        else:
-            sumrecord+=regression(wallet.record[i*100:(i+1)*100])
+    # for i in range(18):
+    #     print(regression(wallet.record[i*100:(i+1)*100]))
+    #     newrecord.append(regression(wallet.record[i*100:(i+1)*100]))
+    #     if regression(wallet.record[i*100:(i+1)*100]) < 0:
+    #         newrecordnum += 1
+    #         nrecordnum.append(regression(wallet.record[i*100:(i+1)*100]))
+    #     else:
+    #         sumrecord+=regression(wallet.record[i*100:(i+1)*100])
 
 
 
-    plt.plot(range(18),newrecord)
-    print(newrecordnum)
-    print(nrecordnum)
-    print(sumrecord/18)
+    #plt.plot(range(18),newrecord)
+    # print(newrecordnum)
+    # print(nrecordnum)
+    # print(sumrecord/18)
+    #plt.show()
+
+    f1,a1 = plt.subplots()
+    a1.plot(aaa,bbb)
+    a1.set_title("使用数据天数与交易次数的关系")
+    a1.set_xlabel("使用数据天数")
+    a1.set_ylabel("交易次数")
+    plt.grid()
+
     plt.show()
+    f1, a1 = plt.subplots()
+    a1.plot(aaa, ccc)
+    a1.set_title("使用数据天数与最终利润的关系")
+    a1.set_xlabel("使用数据天数")
+    a1.set_ylabel("最终利润")
+    plt.grid()
 
+    plt.show()
     # f = open('data.csv','a+')
     # for i in range(1826):
     #     data = price.bitcoindata[i].split('/')
