@@ -87,7 +87,7 @@ def regression(*args):
         count += 1
 
     #print((sumxy - len(args)*average*(len(args)+1)/2)/(sumxx - len(args)*((len(args)+1)/2)*((len(args)+1)/2)))
-    return 50000*(sumxy - len(args)*average*(len(args)+1)/2)/(sumxx - len(args)*((len(args)+1)/2)*((len(args)+1)/2))
+    return (sumxy - len(args)*average*(len(args)+1)/2)/(sumxx - len(args)*((len(args)+1)/2)*((len(args)+1)/2))
 
 da = []
 xiao = []
@@ -113,10 +113,10 @@ def judge(wallet,i,slope,*args):
     bitcoinn.sort(key=None,reverse=False)
     #print(bitcoinn)
     #goldlinem = regression(goldlistj)  # 黄金回归曲线
-    bitcoinlinem = regression(bitcoinlistj)  # 比特币回归曲线
+    bitcoinlinem = regression(bitcoinlistj)*50000  # 比特币回归曲线
     #goldlinen = regression(goldlistj[-int(round / 5):-1])  # 黄金近期曲线
     #bitcoinlinen = regression(bitcoinlistj[-int(round / 5):-1])  # 比特币近期曲线
-    bitcoinlinen = regression(bitcoinlistj[-3:-1])  # 比特币近期曲线
+    bitcoinlinen = regression(bitcoinlistj[-3:-1])*50000  # 比特币近期曲线
     da.append(bitcoinlinem)
     xiao.append(bitcoinlinen)
     ##################################################################################################################
@@ -125,7 +125,50 @@ def judge(wallet,i,slope,*args):
     # print(bitcoinlinem)
     # print("xiao" , end="")
     # print(bitcoinlinen)
+    if wallet.dollor == 0:
+        if wallet.bitcoin >= wallet.base * wallet.lilv and bitcoinlinem > -0.7:  # 如果比特币升值，总体也升值，就放置
+            wallet.lilv = (wallet.dollor + wallet.bitcoin) / wallet.base
+            if bitcoinlinen > 0:  # 最近几天也上升
+                print(wallet.lilv)
+                return 2
+            else:  # 最近几天下降
+                if (wallet.bitcoin) / wallet.base < wallet.lilv * 0.982:  # 0.882
+                    print(wallet.lilv)
+                    return 1
+                else:
+                    print(wallet.lilv)
+                    return 2
+        elif wallet.bitcoin < wallet.base * wallet.lilv and bitcoinlinem > -0.7:  # 如果比特币贬值，但整体升值，和手续费比较，能抵消就不卖
+            if (wallet.bitcoin) / wallet.base < wallet.lilv * 0.882:  # 0.882
+                if bitcoinlinen < 0:
+                    print(wallet.lilv)
+                    return 1
+                else:
+                    print(wallet.lilv)
+                    return 2
+            else:
+                print(wallet.lilv)
+                return 2
+        elif wallet.bitcoin >= wallet.base * wallet.lilv and bitcoinlinem < 0:  # 如果比特币升值，但总体下降，立马卖
+            wallet.lilv = (wallet.dollor + wallet.bitcoin) / wallet.base
+            print(wallet.lilv)
+            return 1
+        else:  # 如果比特币贬值，整体也下降，就卖
+            if (wallet.bitcoin) / wallet.base < wallet.lilv*0.892:  # 0.882
+                print(wallet.lilv)
+                return 2
+            else:
+                print(wallet.lilv)
+                return 1
+    else:
+        if bitcoinlinem > 8.2:
 
+            wallet.lilv = commissionbit * commissionbit * 1.11
+            print(wallet.lilv)
+            return 0
+
+        else:
+            return 2
     #策略
     ##########################################################################################################################
 
@@ -271,7 +314,7 @@ if __name__ == "__main__":
     for i in range(len(wallet.record)):
         iii.append(wallet.record[i])
         price.bitcoinnow[i] *= 10
-    plt.plot(range(0,len(wallet.record)),iii)
+    #plt.plot(range(0,len(wallet.record)),iii)
 
     #plt.plot(e, f,g)
     print(wallet.record)
@@ -291,10 +334,10 @@ if __name__ == "__main__":
     for i in range(len(sell)):
         selly.append(price.bitcoinnow[sell[i]])
 
-    plt.plot(range(len(price.bitcoinnow)),price.bitcoinnow)
-    plt.plot(buy,buyy,'bo',ms=3,color='red')
-    plt.plot(sell,selly,'bo',ms=3,color='blue')
-    plt.show()
+    # plt.plot(range(len(price.bitcoinnow)),price.bitcoinnow)
+    # plt.plot(buy,buyy,'bo',ms=3,color='red')
+    # plt.plot(sell,selly,'bo',ms=3,color='blue')
+    #plt.show()
     # print(wallet.recordnum)
     # print(wallet.dollorin)
     # print(wallet.dollorout)
@@ -324,5 +367,28 @@ if __name__ == "__main__":
     # ax4.plot(range(0, len(d)), c,d)
 
 
+    newrecord = []
+    newrecordnum = 0
+    nrecordnum = []
+    sumrecord = 0
+    for i in range(18):
+        print(regression(wallet.record[i*100:(i+1)*100]))
+        newrecord.append(regression(wallet.record[i*100:(i+1)*100]))
+        if regression(wallet.record[i*100:(i+1)*100]) < 0:
+            newrecordnum += 1
+            nrecordnum.append(regression(wallet.record[i*100:(i+1)*100]))
+        else:
+            sumrecord+=regression(wallet.record[i*100:(i+1)*100])
 
 
+
+    plt.plot(range(18),newrecord)
+    print(newrecordnum)
+    print(nrecordnum)
+    print(sumrecord/18)
+    plt.show()
+
+    # f = open('data.csv','a+')
+    # for i in range(1826):
+    #     data = price.bitcoindata[i].split('/')
+    #     f.write(data[2]+'.'+data[0]+'.'+data[1]+','+str(wallet.record[i])+','+str(price.bitcoinnow[i]*0.1)+','+str(price.goldnow[i])+'\n')
