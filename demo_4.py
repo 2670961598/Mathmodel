@@ -2,45 +2,41 @@
 # import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.pyplot as plt
-
 commissionbit = 0.98#佣金 比特币
 commissiongold = 0.99 #佣金 ，黄金
 
-start = 15
-end   = 50
+
+start = 17
+end   = 18
+
 
 class Wallet:
     def __init__(self):       #基本信息设置
         self.dollor = 1000      #美元
         self.gold   = 0         #黄金
         self.bitcoin= 0         #比特币
-
         self.base = 980.0      #基准
         self.lilv = commissionbit*commissionbit
-
         self.record = []  # 记录交易时间
         self.recordnum = 0  # 记录交易次数
         self.dollorin = []  # 记录购买视觉
         self.dollorout = []  # 记录卖出时间
-
         self.bitcoinm = 0
 
     def now(self):           #方便随时显示基本信息
         print("现有本金" + str(self.dollor) + "美元 \n黄金" + str(self.gold) + "美元 \n比特币" + str(self.bitcoin) + "美元")
         return self.dollor,self.gold,self.bitcoin
 
-
+fggg = open('data.csv','a+')
 class Price:
     def __init__(self):
         self.file1 = open('BCHAIN-MKPRU.csv', 'r')
         self.file2 = open('LBMA-GOLD.csv', 'r')
-
         self.bitcoindata = []       #比特币日期
         self.golddata    = []       #黄金日期
         self.bitcoinnow  = []       #比特币对应日期的价格
         self.goldnow     = []       #黄金同上
         self.goldstate   = []       #黄金是否可以交易
-
         for i in self.file1:
             info = i.split(",")
             if info[0] == "Date":
@@ -121,7 +117,6 @@ def judge(wallet,i,slope,*args):
     bitcoinlinen = regression(bitcoinlistj[-3:-1])*50000  # 比特币近期曲线
     da.append(bitcoinlinem)
     xiao.append(bitcoinlinen)
-
     ##################################################################################################################
     #策略  返回0买（得有钱），返回1卖（得有比特币） 返回其他任意数字均为不动
     # print("da" , end="")
@@ -165,30 +160,22 @@ def judge(wallet,i,slope,*args):
                 return 1
     else:
         if bitcoinlinem > 8.2:
-
             wallet.lilv = commissionbit * commissionbit * 1.11
             #print(wallet.lilv)
             return 0
-
         else:
             return 2
     #策略
     ##########################################################################################################################
-
-
-
 a = []
 b = []
 c = []
 d = []
-
 round = 25 #基于多少数据
-
 goldmiss = 0         #对黄金没有出售的天数的补偿
 y = 600     #没用
 hhh = 0  #计算最大值的
 kkk = 0  #计算最大值的序号
-
 goldlist = []   #过去一段时间黄金利率列表
 bitcoinlist = []#过去一段时间比特币利率列表
 buy = []
@@ -196,13 +183,10 @@ sell = []
 price = Price()
 wallet = Wallet()
 if __name__ == "__main__":
-
     print(len(price.goldstate))
-
     aaa = []
     bbb = []
     ccc = []
-
     e = []
     f = []
     g = []
@@ -219,7 +203,6 @@ if __name__ == "__main__":
         wallet.base = 980
         wallet.lilv = commissionbit*commissionbit
         for i in range(0,1826):
-
             #print("############" + str(i))
             if price.goldstate[i] == False:
                 #print("############" + str(i))
@@ -237,7 +220,6 @@ if __name__ == "__main__":
                 date = price.golddata[i].split('/')
                 #print('今天是20' + date[2] + '年' + date[0] + "月" + date[1], end=" ")
                 #print('今天不可交易黄金' + '\t比特币的价格是' + str(price.bitcoinnow[i]))
-
                 if judge(wallet, i, commissionbit, goldlist, bitcoinlist) == 0:
                     # print("今天相比昨天涨了" + str(bitcoinlist[-1]))
                     wallet.base = (wallet.dollor + wallet.bitcoin) * 0.98
@@ -250,13 +232,10 @@ if __name__ == "__main__":
                     # print("今天相比昨天降了" + str(bitcoinlist[-1]))
                     wallet.base = (wallet.dollor + wallet.bitcoin) * 0.98
                     wallet.dollor = wallet.bitcoin * commissionbit
-
                     wallet.bitcoin = 0
                     wallet.recordnum += 1
                     wallet.dollorout.append(wallet.bitcoin)
                     sell.append(i)
-
-
             else:
                 #print("############" + str(i))
                 if len(goldlist) == 0 or len(bitcoinlist) == 0:
@@ -276,7 +255,6 @@ if __name__ == "__main__":
                 #print('今天是20' + date[2] + '年' + date[0] + "月" + date[1], end=" ")
                 #print('今天不可交易黄金' + '\t比特币的价格是' + str(price.bitcoinnow[i]))
                 #print('今天可以交易黄金\t黄金的价格是' + str(price.goldnow[i]) + '\t比特币的价格是' + str(price.bitcoinnow[i]))
-
                 if judge(wallet, i, commissionbit, goldlist, bitcoinlist) == 0:
                     # print("今天相比昨天涨了" + str(bitcoinlist[-1]))
                     wallet.base = (wallet.dollor + wallet.bitcoin) * 0.98
@@ -294,7 +272,6 @@ if __name__ == "__main__":
                     wallet.recordnum += 1
                     wallet.dollorout.append(wallet.bitcoin)
                     sell.append(i)
-
             wallet.record.append(wallet.dollor+wallet.bitcoin)
             wallet.bitcoin *= (bitcoinlist[-1])
             #wallet.gold    *= (goldlist[-1])
@@ -303,7 +280,9 @@ if __name__ == "__main__":
             if price.goldstate[i]:
                 del goldlist[0]
         print(n ,end=" ")
+        #fggg.write(str(n)+',')
         print(wallet.recordnum,end="  ")
+        #fggg.write(str(wallet.recordnum)+',')
         aaa.append(round)
         bbb.append(wallet.recordnum)
         ccc.append(wallet.dollor+wallet.bitcoin)
@@ -312,46 +291,39 @@ if __name__ == "__main__":
         g.append(wallet.dollor+wallet.bitcoin)
         #wallet.record.sort(key=None,reverse=False)
         print(wallet.record[-1])
+        #fggg.write(str(wallet.record[-1])+'\n')
         if wallet.record[-1] > hhh:
             hhh = wallet.record[-1]
             kkk = n
         #plt.plot(range(len(wallet.record)), wallet.record)
         #plt.show()
-
     plt.rcParams['font.sans-serif'] = ['SimHei']
     plt.rcParams['axes.unicode_minus'] = False
     iii = []
     for i in range(len(wallet.record)):
         iii.append(wallet.record[i])
         price.bitcoinnow[i] *= 10
-    #plt.plot(range(0,len(wallet.record)),iii)
-
+    plt.plot(range(0,len(wallet.record)),iii)
     #plt.plot(e, f,g)
     #print(wallet.record)
-
     r = 0
     t = []
     for i in wallet.record:
         t.append(i*10-r*10)
         r = i
     buyy = []
-
-
-
     for i in range(len(buy)):
         buyy.append(price.bitcoinnow[buy[i]])
     selly = []
     for i in range(len(sell)):
         selly.append(price.bitcoinnow[sell[i]])
-
     # plt.plot(range(len(price.bitcoinnow)),price.bitcoinnow)
     # plt.plot(buy,buyy,'bo',ms=3,color='red')
     # plt.plot(sell,selly,'bo',ms=3,color='blue')
-    #plt.show()
+    plt.show()
     # print(wallet.recordnum)
     # print(wallet.dollorin)
     # print(wallet.dollorout)
-    #
     # print(len(price.goldnow))
     # print(len(goldlist))
     # print(hhh)
@@ -366,7 +338,6 @@ if __name__ == "__main__":
     # print(da)
     # print(xiao)
     # plt.plot(range(len(da)),da)
-
     # ax1 = plt.subplot(221)
     # ax1.plot(range(0, len(a)), a,c)
     # ax2 = plt.subplot(222)
@@ -375,8 +346,6 @@ if __name__ == "__main__":
     # ax3.plot(range(0, len(c)), a,b)
     # ax4 = plt.subplot(224)
     # ax4.plot(range(0, len(d)), c,d)
-
-
     newrecord = []
     newrecordnum = 0
     nrecordnum = []
@@ -389,32 +358,28 @@ if __name__ == "__main__":
     #         nrecordnum.append(regression(wallet.record[i*100:(i+1)*100]))
     #     else:
     #         sumrecord+=regression(wallet.record[i*100:(i+1)*100])
-
-
-
     #plt.plot(range(18),newrecord)
     # print(newrecordnum)
     # print(nrecordnum)
     # print(sumrecord/18)
     #plt.show()
 
-    f1,a1 = plt.subplots()
-    a1.plot(aaa,bbb)
-    a1.set_title("使用数据天数与交易次数的关系")
-    a1.set_xlabel("使用数据天数")
-    a1.set_ylabel("交易次数")
-    plt.grid()
-
-    plt.show()
-    f1, a1 = plt.subplots()
-    a1.plot(aaa, ccc)
-    a1.set_title("使用数据天数与最终利润的关系")
-    a1.set_xlabel("使用数据天数")
-    a1.set_ylabel("最终利润")
-    plt.grid()
-
-    plt.show()
-    # f = open('data.csv','a+')
+    # f1,a1 = plt.subplots()
+    # a1.plot(aaa,bbb,label='使用数据天数与交易次数的关系')
+    # a1.set_title("使用数据天数与交易次数的关系")
+    # a1.set_xlabel("使用数据天数")
+    # a1.set_ylabel("交易次数")
+    # #plt.grid()
+    #
+    # plt.show()
+    # f1, a1 = plt.subplots()
+    #
+    # plt.plot(aaa, ccc,label='使用数据天数与最终利润的关系')
+    # a1.set_title("使用数据天数与最终利润的关系")
+    # a1.set_xlabel("使用数据天数")
+    # a1.set_ylabel("最终利润")
+    # #plt.grid()
+    # plt.show()
     # for i in range(1826):
     #     data = price.bitcoindata[i].split('/')
     #     f.write(data[2]+'.'+data[0]+'.'+data[1]+','+str(wallet.record[i])+','+str(price.bitcoinnow[i]*0.1)+','+str(price.goldnow[i])+'\n')
